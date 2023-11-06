@@ -14,7 +14,9 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 BUILD_DEPENDS=	rustc:lang/${RUST_DEFAULT} \
 		${PYTHON_PKGNAMEPREFIX}setuptools>=62.6:devel/py-setuptools@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}wheel>=0.37.1:devel/py-wheel@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}pbr>=2.0.0:devel/py-pbr@${PY_FLAVOR}
+		${PYTHON_PKGNAMEPREFIX}pbr>=2.0.0:devel/py-pbr@${PY_FLAVOR} \
+		${PYTHON_PKGNAMEPREFIX}tox>=3.18.0:devel/py-tox@${PY_FLAVOR} \
+		${LOCALBASE}/include/lber.h:net/openldap${OPENLDAP_VER}-client
 # XXX these dependencies are a problem because they need to exclude versions
 #		oslo.serialization!=2.19.1,>=2.18.0 : specify >2.19.1
 #		pycadf!=2.0.0,>=1.1.0 : specify >2.0.0
@@ -84,8 +86,8 @@ PGSQL_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}psycopg2>=0:databases/py-psycopg2@${PY
 
 post-patch:
 	(cd ${WRKSRC} && \
-		oslo-config-generator --config-file=config-generator/keystone.conf; \
-		oslopolicy-sample-generator --config-file=config-generator/keystone-policy-generator.conf; )
+		LDFLAGS=-L${LOCALBASE}/lib CPPFLAGS=-I${LOCALBASE}/include tox -egenconfig; \
+		LDFLAGS=-L${LOCALBASE}/lib CPPFLAGS=-I${LOCALBASE}/include tox -egenpolicy; )
 	@${GREP} -Rl -e '/etc/keystone/' --null \
 		${WRKSRC}/etc ${WRKSRC}/doc ${WRKSRC}/keystone | \
 			${XARGS} -0 ${REINPLACE_CMD} -i '' -Ee \
@@ -98,7 +100,6 @@ post-patch:
 
 post-install:
 	@${MKDIR} ${STAGEDIR}${ETCDIR}
-	(cd ${WRKSRC}/etc && for f in *; do \
-		${INSTALL_DATA} $${f} ${STAGEDIR}${ETCDIR}; done)
+	(cd ${WRKSRC}/etc && ${COPYTREE_SHARE} . ${STAGEDIR}${ETCDIR})
 
 .include <bsd.port.mk>
