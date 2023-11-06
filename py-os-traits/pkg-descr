@@ -1,0 +1,9 @@
+OpenStack library containing standardized trait strings.
+
+Traits are strings that represent a feature of a resource provider
+hosted by the Placement service. This library contains the catalog of
+constants that have been standardized in the OpenStack community to
+refer to a particular hardware, virtualization, storage, network, or
+device trait.
+
+WWW: https://docs.openstack.org/os-traits/

@@ -1,0 +1,7 @@
+A list of standardized resource classes for OpenStack.
+
+A resource class is a distinct type of inventory that exists in a
+cloud environment, for example VCPU, DISK_GB. They are upper case with
+underscores. They often include a unit in their name.
+
+WWW: https://docs.openstack.org/os-resource-classes/
