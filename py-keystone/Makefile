@@ -54,7 +54,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}pbr>=2.0.0:devel/py-pbr@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}pytz>=2013.6:devel/py-pytz@${PY_FLAVOR}
 
 USES=		python:3.8+
-USE_PYTHON=	autoplist concurrent pep517
+USE_PYTHON=	autoplist pep517
 NO_ARCH=	yes
 
 USERS=		keystone

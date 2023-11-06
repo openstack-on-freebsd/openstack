@@ -60,7 +60,7 @@ RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}pbr>=3.1.1:devel/py-pbr@${PY_FLAVOR} \
 #		${PYTHON_PKGNAMEPREFIX}glance-store>=2.3.0:devel/py-glance-store@${PY_FLAVOR} \
 
 USES=		python:3.8+
-USE_PYTHON=	autoplist concurrent pep517
+USE_PYTHON=	autoplist pep517
 NO_ARCH=	yes
 
 USERS=		glance
