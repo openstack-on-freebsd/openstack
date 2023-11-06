@@ -1,0 +1,54 @@
+From dc37e4ffe67bd7c5be6b5e7792bf1cb9a216d35b Mon Sep 17 00:00:00 2001
+From: Chuck Tuffli <chuck@tuffli.net>
+Date: Thu, 26 Oct 2023 15:25:13 -0700
+Subject: [PATCH 1/2] fix: close file descriptors portably
+
+Find open file descriptors using the psutil module instead of scanning
+the (Linux specific) /proc/self/fd directory directly.
+---
+ oslo_rootwrap/cmd.py | 9 +++++----
+ requirements.txt     | 1 +
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/oslo_rootwrap/cmd.py b/oslo_rootwrap/cmd.py
+index b28a200..5eb3779 100644
+--- a/oslo_rootwrap/cmd.py
++++ b/oslo_rootwrap/cmd.py
+@@ -32,6 +32,7 @@
+ import configparser
+ import logging
+ import os
++import psutil
+ import sys
+ 
+ from oslo_rootwrap import subprocess
+@@ -99,13 +100,13 @@ def main(run_daemon=False):
+         if (fd_limits[0] > sensible_fd_limit):
+             # Close any fd beyond sensible_fd_limit prior adjusting our
+             # rlimit to ensure all fds are closed
+-            for fd_entry in os.listdir('/proc/self/fd'):
++            proc = psutil.Process()
++            for fd_entry in proc.open_files():
+                 # NOTE(dmllr): In a previous patch revision non-numeric
+                 # dir entries were silently ignored which reviewers
+                 # didn't like. Readd exception handling when it occurs.
+-                fd = int(fd_entry)
+-                if fd >= sensible_fd_limit:
+-                    os.close(fd)
++                if fd_entry.fd >= sensible_fd_limit:
++                    os.close(fd_entry.fd)
+             # Unfortunately this inherits to our children, so allow them to
+             # re-raise by passing through the hard limit unmodified
+             resource.setrlimit(
+diff --git a/requirements.txt b/requirements.txt
+index 2683dd4..6c8edda 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -2,3 +2,4 @@
+ # of appearance. Changing the order has an impact on the overall integration
+ # process, which may cause wedges in the gate later.
+ 
++psutil>=5.9.5 # BSD-3
+-- 
+2.41.0
+

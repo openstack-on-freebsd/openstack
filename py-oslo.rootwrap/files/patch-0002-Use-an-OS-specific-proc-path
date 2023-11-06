@@ -1,0 +1,31 @@
+From ce8c49e5bfd2147526fbac1788e9dec4c851a50d Mon Sep 17 00:00:00 2001
+From: Chuck Tuffli <chuck@tuffli.net>
+Date: Thu, 26 Oct 2023 15:29:29 -0700
+Subject: [PATCH 2/2] Use an OS-specific proc path
+
+Linux and FreeBSD use slightly different /proc entries to map a process
+ID to the program name
+---
+ oslo_rootwrap/filters.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/oslo_rootwrap/filters.py b/oslo_rootwrap/filters.py
+index 8d7bf0e..6d412b9 100644
+--- a/oslo_rootwrap/filters.py
++++ b/oslo_rootwrap/filters.py
+@@ -208,7 +208,11 @@ class KillFilter(CommandFilter):
+         """Determine the program associated with pid"""
+ 
+         try:
+-            command = os.readlink("/proc/%d/exe" % int(pid))
++            if sys.platform.startswith('freebsd'):
++                proc_path = "/proc/%d/file"
++            else:
++                proc_path = "/proc/%d/exe"
++            command = os.readlink(proc_path % int(pid))
+         except (ValueError, EnvironmentError):
+             # Incorrect PID
+             return None
+-- 
+2.41.0
+
