@@ -1,0 +1,5 @@
+OpenStack Placement provides an HTTP service for managing, selecting,
+and claiming providers of classes of inventory representing available
+resources in a cloud.
+
+WWW: https://docs.openstack.org/placement/

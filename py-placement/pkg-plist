@@ -1,0 +1,4 @@
+@owner placement
+@dir %%ETCDIR%%
+@sample %%ETCDIR%%/placement.conf.sample
+@sample %%ETCDIR%%/policy.yaml.sample
